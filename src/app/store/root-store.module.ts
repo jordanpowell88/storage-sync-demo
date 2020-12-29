@@ -21,7 +21,8 @@ function localStorageSyncReducer(
   reducer: ActionReducer<RootState>
 ): ActionReducer<RootState> {
   return localStorageSync({
-    keys: [{ [COUNTERS_KEY]: ["count"] }]
+    keys: [{ [COUNTERS_KEY]: ["count"] }],
+    rehydrate: true
   })(reducer);
 }
 
