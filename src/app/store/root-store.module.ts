@@ -1,5 +1,6 @@
 import { NgModule } from "@angular/core";
 import {
+  Action,
   ActionReducer,
   ActionReducerMap,
   MetaReducer,
@@ -12,9 +13,27 @@ import {
   reducer as countersReducer
 } from "./counters-store/counters.reducer";
 import { RootState } from "./root-state";
+import merge from "lodash.merge";
+const INIT_ACTION = "@ngrx/store/init";
+const UPDATE_ACTION = "@ngrx/store/update-reducers";
 
 const reducers: ActionReducerMap<RootState> = {
   [COUNTERS_KEY]: countersReducer
+};
+
+const mergeReducer = (
+  state: RootState,
+  rehydratedState: RootState,
+  action: Action
+) => {
+  if (
+    (action.type === INIT_ACTION || action.type === UPDATE_ACTION) &&
+    rehydratedState
+  ) {
+    state = merge(state, rehydratedState);
+  }
+
+  return state;
 };
 
 function localStorageSyncReducer(
@@ -22,7 +41,8 @@ function localStorageSyncReducer(
 ): ActionReducer<RootState> {
   return localStorageSync({
     keys: [{ [COUNTERS_KEY]: ["count"] }],
-    rehydrate: true
+    rehydrate: true,
+    mergeReducer
   })(reducer);
 }
 
